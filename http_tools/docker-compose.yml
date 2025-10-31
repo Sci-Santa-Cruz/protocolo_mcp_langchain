@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  tools-server-http:
+    build:
+      context: ../..
+      dockerfile: mcp_examples/http_tools/Dockerfile
+    env_file:
+      - ../../.env
+    working_dir: /app/mcp_examples/http_tools
+    volumes:
+      - ./../..:/app
+    command: uvicorn tools_server_http:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+
+  gradio-http-client:
+    build:
+      context: ../..
+      dockerfile: mcp_examples/http_tools/Dockerfile
+    env_file:
+      - ../../.env
+    working_dir: /app/mcp_examples/http_tools
+    # OPENAI_API_KEY será cargada desde el env_file en el contenedor
+    environment:
+      - SERVER_URL=http://tools-server-http:8000/sse
+    command: python orchestrator_mcp_client_http.py
+    ports:
+      - "7863:7863"

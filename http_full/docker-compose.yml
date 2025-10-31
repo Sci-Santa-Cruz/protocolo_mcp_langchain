@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  orchestrator-http-full:
+    build:
+      context: ../..
+      dockerfile: mcp_examples/http_full/Dockerfile
+    env_file:
+      - ../../.env
+    working_dir: /app/mcp_examples/http_full
+    command: uvicorn orchestrator_server_http:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+
+  gradio-http-full-client:
+    build:
+      context: ../..
+      dockerfile: mcp_examples/http_full/Dockerfile
+    env_file:
+      - ../../.env
+    working_dir: /app/mcp_examples/http_full
+    environment:
+      - SERVER_URL=http://orchestrator-http-full:8001/sse
+    command: python simple_client_http.py
+    ports:
+      - "7862:7862"
